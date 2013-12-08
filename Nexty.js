@@ -1,19 +1,28 @@
 "use strict";
 
-var JS = require('jsclass');
-var Class = require('jsclass/src/core').Class;
+var noop = function() {};
 
 /**
  * A class to allow pushing and unshifting tasks onto a stack
- * @class Nextify
+ * @class Nexty
  */
-var Nextify = new Class({
-	
+function Nexty() {
+	if (arguments[0] === noop) {
+		return;
+	}
+	this.initialize.apply(this, Array.prototype.slice.call(arguments));
+}
+
+Nexty.subclass = function(ctor) {
+	ctor = ctor || function() {};
+	ctor.prototype = new Nexty(noop);
+};
+
+Nexty.prototype = {
 	initialize: function() {
 		this._queue = [];
-		this._handlers = {};
+		this._handlers = {};		
 	},
-	
 	/**
 	 * Add a task to the end of the task stack
 	 * @method push
@@ -31,6 +40,37 @@ var Nextify = new Class({
 	unshift: function(fn) {
 		this._queue.unshift(fn);
 		return this;
+	},
+	
+	/**
+	 * Shift off the function at the beginning of the queue
+	 * @method shift
+	 * @return {Function}
+	 */
+	shift: function() {
+		return this._queue.shift();
+	},
+	
+	/**
+	 * Pop off the function at the end of the queue
+	 * @method pop
+	 * @return {Function}
+	 */
+	pop: function() {
+		return this._queue.pop();
+	},
+	
+	/**
+	 * Unshift the given number of functions
+	 * @method skip
+	 * @param {Number} [num]  The number of functions to skip (Defaults to 1)
+	 * @return {Function}
+	 */
+	skip: function(num) {
+		num = num || 1;
+		while (num--) {
+			this._queue.shift();
+		}
 	},
 	
 	/**
@@ -60,6 +100,9 @@ var Nextify = new Class({
 				this._queue.shift().apply(this, args);
 			}
 			catch (e) {
+				if (!this._handlers.error || this._handlers.error.length === 0) {
+					throw e;
+				}
 				e.arguments = args;
 //				this.hasFailed = true;
 				this.notify('error', [e]);
@@ -72,11 +115,34 @@ var Nextify = new Class({
 		}
 	},
 	
+	/**
+	 * Throw an error
+	 * @param {String} message
+	 * @return {undefined}
+	 */
+	fail: function(message) {
+		throw new Error(message);
+	},
+	
 	on: function(event, handler) {
 		if (!this._handlers[event]) {
 			this._handlers[event] = [];
 		}
 		this._handlers[event].push(handler);
+		return this;
+	},
+	
+	off: function(event, handler) {
+		if (!this._handlers[event]) {
+			return this;
+		}
+		var handlers = [];
+		for (var i = 0, len = this._handlers[event].length; i < len; i++) {
+			if (this._handlers[event][i] !== handler) {
+				handlers.push(this._handlers[event][i]);
+			}
+		}
+		this._handlers[event] = handlers;
 		return this;
 	},
 	
@@ -102,6 +168,6 @@ var Nextify = new Class({
 //		// like next but causes failure?
 //	},
 	
-});
+};
 
-module.exports = Nextify;
+module.exports = Nexty;
