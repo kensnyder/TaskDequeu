@@ -322,5 +322,26 @@ module.exports = {
 		test.deepEqual(data, [1,3,6], 'skip shifts off the given number');
 		test.done();
 	}
+	,
+	"skipAll()": function(test) {
+		var tasks = new Nexty();
+		var data = [];
+		tasks.push(function() {
+			data.push(1);
+			this.skipAll();
+			this.next();
+		});
+		tasks.push(function() {
+			data.push(2);
+			this.next();
+		});
+		tasks.push(function() {
+			data.push(3);
+			this.next();
+		});
+		tasks.start();
+		test.deepEqual(data, [1], 'skipAll resets the queue');
+		test.done();
+	}
 	
 };
