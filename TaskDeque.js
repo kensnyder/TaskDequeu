@@ -75,6 +75,11 @@ TaskDeque.prototype = {
 	 * @property hasFailed
 	 * @type {Boolean}
 	 */
+	/**
+	 * Number of seconds (NOT milliseconds) after which to enter a timeout state
+	 * @property timeout
+	 * @type {Number}
+	 */
 	
 	/**
 	 * Initialize queue and private vars
@@ -148,6 +153,7 @@ TaskDeque.prototype = {
 	
 	/**
 	 * Clear out the queue and skip to the success and done callbacks
+	 * @method skipAll
 	 * @param {Any} [arg1]  An argument to pass to the done handlers
 	 * @param {Any} [arg2]  A second argument to pass to the done handlers
 	 * @param {Any} [argN]  (Any number of arguments are allowed)
@@ -238,8 +244,9 @@ TaskDeque.prototype = {
 	},
 	
 	/**
-	 * Throw an error
-	 * @param {String} message
+	 * Throw an error and enter the failure state
+	 * @method fail
+	 * @param {String} message  The error message
 	 * @return {undefined}
 	 */
 	fail: function(message) {
