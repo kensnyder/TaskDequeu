@@ -28,9 +28,11 @@ module.exports = {
 			i++;
 		});
 		test.strictEqual(i, 0, "task hasn't run yet");
+		test.strictEqual(tasks.hasStarted, false, "hasStarted starts as false");
 		
 		tasks.start();
 		test.strictEqual(i, 1, 'single function runs');
+		test.strictEqual(tasks.hasStarted, true, "hasStarted gets set to true");
 		test.done();
 	}
 	,
@@ -341,6 +343,61 @@ module.exports = {
 		});
 		tasks.start();
 		test.deepEqual(data, [1], 'skipAll resets the queue');
+		test.done();
+	}
+	,
+	"thenStart()": function(test) {
+		var tasks = new TaskDeque();
+		var data = [];
+		tasks.push(function() {
+			data.push(1);
+			this.next();
+		});
+		var tasks2 = tasks.thenStart();
+		test.strictEqual(tasks2 instanceof TaskDeque, true, 'thenStart returns new deque');
+		tasks2.push(function() {
+			data.push(3);
+			this.next();
+		});
+		tasks.push(function() {
+			data.push(2);
+			this.next();
+		});
+		tasks2.push(function() {
+			data.push(4);
+			this.next();
+		});
+		tasks.start();
+		test.deepEqual(data, [1,2,3,4], 'tasks execute in the correct order');
+		test.done();
+	}
+	,
+	"subclass()": function(test) {
+		var Workhorse = TaskDeque.subclass({
+			initialize: function() {
+				this.data = [];
+			},
+			multiply: function(by) {
+				for (var i = 0; i < this.data.length; i++) {
+					this.data[i] = this.data[i] * by;
+				}
+			}
+		});
+		var tasks = new Workhorse();
+		test.strictEqual(tasks instanceof Workhorse, true, 'subclass returns a function');
+		test.strictEqual(tasks instanceof TaskDeque, true, 'prototype chain is correct');
+		tasks.push(function() {
+			this.data.push(1);
+			this.next();
+		});
+		tasks.push(function() {
+			this.data.push(2);
+			this.next();
+		});
+		tasks.start();
+		test.deepEqual(tasks.data, [1,2], 'subclass behaves the same way');
+		tasks.multiply(3);
+		test.deepEqual(tasks.data, [3,6], 'subclass method added ok');
 		test.done();
 	}
 	

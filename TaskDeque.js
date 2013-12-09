@@ -13,18 +13,72 @@ function TaskDeque() {
 	this.initialize.apply(this, Array.prototype.slice.call(arguments));
 }
 
-TaskDeque.subclass = function(ctor) {
-	ctor = ctor || function() {};
+/**
+ * Create a subclass of TaskDeque
+ * @param {Object} [methods]  Additional methods for the class, if any
+ * @return {Function}  A new function with the same prototype methods as TaskDeque
+ */
+TaskDeque.subclass = function(methods) {
+	var ctor = function() {
+		this.initialize.apply(this, Array.prototype.slice.call(arguments));
+	};
 	ctor.prototype = new TaskDeque(noop);
+	if (methods) {
+		for (var name in methods) {
+			if (name === 'initialize') {
+				methods.initialize = (function(baseInitialize, newInitialize) {
+					return function() {
+						var args = Array.prototype.slice.call(arguments);
+						baseInitialize.apply(this, arguments);
+						newInitialize.apply(this, arguments);
+					};
+				})(TaskDeque.prototype.initialize, methods.initialize);
+			}
+			if (methods.hasOwnProperty(name)) {
+				ctor.prototype[name] = methods[name];
+			}
+		}
+	}
+	return ctor;
 };
 
 TaskDeque.prototype = {
+	
+	/**
+	 * The stack that holds functions
+	 * @property _queue
+	 * @type {Array}
+	 * @private
+	 */
+	/**
+	 * Lists of registered handlers indexed by event name
+	 * @property _handlers
+	 * @type {Array[]}
+	 * @private
+	 */
+	/**
+	 * True if the task queue has started
+	 * @property hasStarted
+	 * @type {Boolean}
+	 */
+	/**
+	 * True if the task queue encountered an exception or a call to fail()
+	 * @property hasFailed
+	 * @type {Boolean}
+	 */
+	
+	/**
+	 * Initialize queue and private vars
+	 * @constructor
+	 * @return {undefined}
+	 */
 	initialize: function() {
 		this._queue = [];
 		this._handlers = {};
 		this.hasStarted = false;
 		this.hasFailed = false;
 	},
+	
 	/**
 	 * Add a task to the end of the task stack
 	 * @method push
@@ -36,6 +90,7 @@ TaskDeque.prototype = {
 		this._queue.push(fn);
 		return this;
 	},
+	
 	/**
 	 * Add a task to beginning of the task stack
 	 * @method unshift
@@ -210,12 +265,12 @@ TaskDeque.prototype = {
 	},
 	
 	/**
-	 * Create a new instance of Next that will start when this one is done
+	 * Create a new instance of TaskDeque that will start when this one is done
 	 * @method thenStart
 	 * @param {Any} [arg1]  An argument to pass to the first handler of the new instance
 	 * @param {Any} [arg2]  A second argument to pass to the first handler of th e new instance
 	 * @param {Any} [argN]  (Any number of arguments are allowed)
-	 * @return {TaskDeque}
+	 * @return {TaskDeque}  A new instance of TaskDeque
 	 * @chainable
 	 */		
 	thenStart: function() {
@@ -232,16 +287,6 @@ TaskDeque.prototype = {
 		}
 		return tasks;
 	}
-//	unshift: function(fn, ontoCheckpoint) {},
-//	remove: function(name) {},
-//	skip: function(checkpointName) {},
-//	// idea is to be able to shift or unshift within a set or checkpoint
-//	checkpoint: function(checkpointName) {
-//		this._queue.push({checkpoint:checkpointName});
-//	},
-//	fail: function() {
-//		// like next but causes failure?
-//	},
 	
 };
 
