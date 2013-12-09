@@ -1,6 +1,6 @@
 {
-  "name": "Nexty",
-  "description": "A class to allow pushing and unshifting tasks onto a stack",
+  "name": "task-deque",
+  "description": "A class to allow pushing and unshifting tasks onto a double ended queue (deque)",
   "version": "0.1.0",
   "engines": {
     "node": ">= 0.8.0"

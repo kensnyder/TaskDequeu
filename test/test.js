@@ -1,18 +1,18 @@
 "use strict";
 
-var Nexty = require('../Nexty.js');
+var TaskDeque = require('../TaskDeque.js');
 
 module.exports = {
 	
 	"instantiation": function(test) {
-		var tasks = new Nexty();
-		test.strictEqual(tasks instanceof Nexty, true, 'constructor produces object');
+		var tasks = new TaskDeque();
+		test.strictEqual(tasks instanceof TaskDeque, true, 'constructor produces object');
 		test.deepEqual(tasks._queue, [], 'has queue');
 		test.done();
 	}
 	,
 	"push()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		tasks.push(function() {});
 		test.strictEqual(tasks._queue.length, 1, 'task added to queue');
 		
@@ -22,7 +22,7 @@ module.exports = {
 	}
 	,
 	"start()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var i = 0;
 		tasks.push(function() {
 			i++;
@@ -35,7 +35,7 @@ module.exports = {
 	}
 	,
 	"start() with args": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var i = 0;
 		tasks.push(function(num) {
 			i += num;
@@ -47,7 +47,7 @@ module.exports = {
 	}
 	,
 	"next()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -63,7 +63,7 @@ module.exports = {
 	}
 	,
 	"next() passes args to next task": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -79,7 +79,7 @@ module.exports = {
 	}
 	,
 	"unshift()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -104,7 +104,7 @@ module.exports = {
 	,
 	"on('done')": function(test) {
 		test.expect(1);
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -125,7 +125,7 @@ module.exports = {
 	,
 	"off('done')": function(test) {
 		test.expect(1);
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -144,7 +144,7 @@ module.exports = {
 	,
 	"next() passes args to done()": function(test) {
 		test.expect(4);
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		tasks.push(function() {
 			this.next(1, 2);
 		});
@@ -163,7 +163,7 @@ module.exports = {
 	,
 	"on('error')": function(test) {
 		test.expect(5);
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		tasks.push(function() {
 			throw new Error('oops');
 		});
@@ -182,7 +182,7 @@ module.exports = {
 	,
 	"fail()": function(test) {
 		test.expect(5);
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		tasks.push(function() {
 			this.fail('oops');
 		});
@@ -200,7 +200,7 @@ module.exports = {
 	}
 	,
 	"shift()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -221,7 +221,7 @@ module.exports = {
 	}
 	,
 	"shift() returns function": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -245,7 +245,7 @@ module.exports = {
 	}
 	,
 	"pop()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -266,7 +266,7 @@ module.exports = {
 	}
 	,
 	"pop() returns function": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);			
@@ -290,7 +290,7 @@ module.exports = {
 	}
 	,
 	"skip()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);
@@ -324,7 +324,7 @@ module.exports = {
 	}
 	,
 	"skipAll()": function(test) {
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var data = [];
 		tasks.push(function() {
 			data.push(1);

@@ -66,7 +66,7 @@ module.exports = function(grunt) {
 		},
 		watch: {
 			scripts: {
-				files: ['Gruntfile.js', 'Nexty.js', 'test/**/*.*'],
+				files: ['Gruntfile.js', 'TaskDeque.js', 'test/**/*.*'],
 				tasks: ['jshint', 'nodeunit']
 			}
 		}

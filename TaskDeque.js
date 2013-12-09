@@ -4,21 +4,21 @@ var noop = function() {};
 
 /**
  * A class to allow pushing and unshifting tasks onto a stack
- * @class Nexty
+ * @class TaskDeque
  */
-function Nexty() {
+function TaskDeque() {
 	if (arguments[0] === noop) {
 		return;
 	}
 	this.initialize.apply(this, Array.prototype.slice.call(arguments));
 }
 
-Nexty.subclass = function(ctor) {
+TaskDeque.subclass = function(ctor) {
 	ctor = ctor || function() {};
-	ctor.prototype = new Nexty(noop);
+	ctor.prototype = new TaskDeque(noop);
 };
 
-Nexty.prototype = {
+TaskDeque.prototype = {
 	initialize: function() {
 		this._queue = [];
 		this._handlers = {};
@@ -29,7 +29,7 @@ Nexty.prototype = {
 	 * Add a task to the end of the task stack
 	 * @method push
 	 * @param {Function} fn  The task to add to the end of the stack
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */
 	push: function(fn) {
@@ -40,7 +40,7 @@ Nexty.prototype = {
 	 * Add a task to beginning of the task stack
 	 * @method unshift
 	 * @param {Function} fn  The task to add to the beginning of the stack
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */
 	unshift: function(fn) {
@@ -86,7 +86,7 @@ Nexty.prototype = {
 	 * @param {Any} [arg1]  An argument to pass to the done handlers
 	 * @param {Any} [arg2]  A second argument to pass to the done handlers
 	 * @param {Any} [argN]  (Any number of arguments are allowed)
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */
 	skipAll: function() {
@@ -156,7 +156,7 @@ Nexty.prototype = {
 	 * @method on
 	 * @param {String} event  An event to bind to: error, success, done
 	 * @param {Function} handler
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */
 	on: function(event, handler) {
@@ -172,7 +172,7 @@ Nexty.prototype = {
 	 * @method off
 	 * @param {String} event
 	 * @param {Function} handler
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */	
 	off: function(event, handler) {
@@ -194,7 +194,7 @@ Nexty.prototype = {
 	 * @method notify
 	 * @param {String} event  The name of the event
 	 * @param {Array} args  Arguments to pass to each one
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */		
 	notify: function(event, args) {
@@ -215,12 +215,12 @@ Nexty.prototype = {
 	 * @param {Any} [arg1]  An argument to pass to the first handler of the new instance
 	 * @param {Any} [arg2]  A second argument to pass to the first handler of th e new instance
 	 * @param {Any} [argN]  (Any number of arguments are allowed)
-	 * @return {Nexty}
+	 * @return {TaskDeque}
 	 * @chainable
 	 */		
 	thenStart: function() {
 		var args = Array.prototype.slice.call(arguments);
-		var tasks = new Nexty();
+		var tasks = new TaskDeque();
 		var start = function() {
 			tasks.start.call(tasks, args);
 		};
@@ -245,4 +245,4 @@ Nexty.prototype = {
 	
 };
 
-module.exports = Nexty;
+module.exports = TaskDeque;
