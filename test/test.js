@@ -400,5 +400,77 @@ module.exports = {
 		test.deepEqual(tasks.data, [3,6], 'subclass method added ok');
 		test.done();
 	}
+	,
+	"timeout": function(test) {		
+		test.expect(3);
+		var tasks = new TaskDeque();
+		test.strictEqual(typeof tasks.timeout, 'number', 'timeout property is a number');
+		
+		var data = [];
+		tasks.timeout = 0.030;
+		tasks.push(function() {
+			data.push(1);
+			setTimeout(function() {	
+				tasks.next();
+			}, 60);
+		});
+		tasks.push(function() {
+			data.push(2);
+			tasks.next();
+		});
+		tasks.on('timeout', function(letter) {
+			test.strictEqual(letter, 'a', 'timeout handlers are called with args');
+		});
+		setTimeout(function() {				
+			test.deepEqual(data, [1], 'script times out');
+			test.done();
+		}, 90);
+		tasks.start('a');
+	}
+	,
+	"timeout cleared on completion": function(test) {		
+		test.expect(1);
+		var tasks = new TaskDeque();
+		var data = [];
+		tasks.timeout = 0.030;
+		tasks.push(function() {
+			data.push(1);
+			tasks.next();
+		});
+		tasks.on('timeout', function() {	
+			data.push(2);
+		});
+		setTimeout(function() {				
+			test.deepEqual(data, [1], 'timeout event not called');
+			test.done();
+		}, 60);
+		tasks.start();
+	}
+	,
+	"resetTimeout()": function(test) {		
+		test.expect(1);
+		var tasks = new TaskDeque();
+		var data = [];
+		tasks.timeout = 0.030;
+		tasks.push(function() {
+			data.push(1);
+			setTimeout(function() {	
+				tasks.next();
+			}, 60);
+			setTimeout(function() {	
+				tasks.timeout = 1;
+				tasks.resetTimeout();
+			}, 15);
+		});
+		tasks.push(function() {
+			data.push(2);
+			tasks.next();
+		});
+		setTimeout(function() {				
+			test.deepEqual(data, [1,2], 'script times out');
+			test.done();
+		}, 90);
+		tasks.start();
+	}
 	
 };
